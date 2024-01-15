@@ -1,0 +1,17 @@
+# Node.js
+node_modules/
+
+# Build files
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Dependendo do seu editor, você pode querer adicionar arquivos específicos do seu editor, por exemplo, para o Visual Studio Code:
+.vscode/
