@@ -2,18 +2,22 @@
     "version": 2,
     "builds": [
       {
-        "src": "src/app.ts",
+        "src": "src/index.ts",
         "use": "@vercel/node"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "/src/app.ts"
+        "dest": "src/index.ts"
       }
     ],
     "env": {
       "NODE_ENV": "production"
+    },
+    "dev": {
+      "command": "yarn run dev",
+      "port": 3000 
     }
   }
   
