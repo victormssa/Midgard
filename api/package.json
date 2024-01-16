@@ -25,7 +25,7 @@
   "scripts": {
     "start": "node dist/app.js",
     "dev": "ts-node src/app.ts",
-    "build": "tsc",
+    "build": "export PATH=$PATH:./node_modules/.bin && tsc",
     "migrate": "ts-node src/database/migrate.ts"
   }
 }
