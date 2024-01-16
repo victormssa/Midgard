@@ -2,7 +2,10 @@ import pgPromise from 'pg-promise';
 import bcrypt from 'bcrypt';
 
 const pgp = pgPromise();
-const db = pgp('postgres://postgres:root@localhost:5432/SonnenSoftware');
+const db = pgp({
+  connectionString: `postgres://default:o8IXk5YqhDOC@ep-shrill-water-37596289-pooler.us-east-1.postgres.vercel-storage.com:5432/verceldb`,
+  ssl: { rejectUnauthorized: false },
+});
 
 const runMigrations = async () => {
   try {

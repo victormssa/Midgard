@@ -22,6 +22,10 @@ interface UpdateUserPayload {
 }
 
 const userRoutes = async (fastify: FastifyInstance) => {
+  fastify.get('/', async (request, reply) => {
+    return { message: 'Rota de teste funcionando!' };
+  });
+
   // Obter todos os usuários
   fastify.get('/users', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
