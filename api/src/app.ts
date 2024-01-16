@@ -1,10 +1,12 @@
 import fastify, { FastifyInstance } from 'fastify';
-import fastifyCors from '@fastify/cors'
+import fastifyCors from '@fastify/cors';
 import fastifySensible from '@fastify/sensible';
 import autoload from '@fastify/autoload';
 
+import { db, runMigrations } from './database/db';
+
 const serverOptions = {
-  logger: true, 
+  logger: true,
 };
 
 // Configurações do CORS
@@ -45,12 +47,19 @@ async function setupServer() {
 
 // Função para iniciar o servidor
 const start = async () => {
-  const server = await setupServer();
-
   try {
+    // Inicializar a conexão com o banco de dados
+    await db.connect();
+
+    // Verificar se a tabela 'users' existe e rodar migrações se necessário
+    await runMigrations();
+
+    // Configurar o servidor
+    const server = await setupServer();
+
     // Iniciar o servidor e ouvir na porta 3001
     await server.listen({ port: 3001, host: '0.0.0.0' });
-    
+
     const serverAddress = server.server.address();
     if (typeof serverAddress === 'string') {
       server.log.info(`Server listening at ${serverAddress}`);
@@ -60,7 +69,7 @@ const start = async () => {
       server.log.warn(`Unable to determine server address and port`);
     }
   } catch (err) {
-    server.log.error(`Error starting server: ${err}`);
+    console.error(`Error starting server: ${err}`);
     process.exit(1);
   }
 };

@@ -1,16 +1,20 @@
 import pgPromise from 'pg-promise';
+import bcrypt from 'bcrypt';
 
 const pgp = pgPromise();
 const db = pgp('postgres://postgres:root@localhost:5432/SonnenSoftware');
 
 const runMigrations = async () => {
   try {
-    const appliedMigrations = await db.query('SELECT name FROM public.migrations');
+    // Verificar se a tabela 'users' existe
+    const tableExists = await db.oneOrNone(
+      "SELECT to_regclass('public.users') AS table_exists"
+    );
 
-    if (!appliedMigrations.includes('initial_migration')) {
+    if (!tableExists.table_exists) {
       // Criar a tabela de usuários com id aleatório
       await db.query(`
-        CREATE TABLE IF NOT EXISTS public.users (
+        CREATE TABLE public.users (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
           username VARCHAR(255) NOT NULL,
           password VARCHAR(255) NOT NULL,
@@ -45,17 +49,21 @@ const runMigrations = async () => {
       ];
 
       // Formatar os dados para a inserção
-      const formattedUsers = users.map(user => `('${user.join("','")}')`).join(',');
-
+      const formattedUsers = await Promise.all(
+        users.map(async user => {
+          const hashedPassword = await bcrypt.hash(user[1], 10); // 10 é o custo do hash
+          return `('${user[0]}', '${hashedPassword}', '${user[2]}', '${user[3]}', '${user[4]}')`;
+        })
+      );
       // Executar a inserção
-      await db.query(`INSERT INTO public.users (username, password, email, company_name, phone) VALUES ${formattedUsers}`);
-
-      // Registrar a migração na tabela 'migrations'
-      await db.query('INSERT INTO public.migrations (name) VALUES ($1)', ['initial_migration']);
+      await db.query(`
+        INSERT INTO public.users (username, password, email, company_name, phone)
+        VALUES ${formattedUsers}
+      `);
 
       console.log('Migrations completed.');
     } else {
-      console.log('Migrations already applied.');
+      console.log('Table "users" already exists. Migrations not needed.');
     }
   } catch (error) {
     console.error('Error running migrations:', error);
@@ -64,4 +72,3 @@ const runMigrations = async () => {
 };
 
 export { db, runMigrations };
-
