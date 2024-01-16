@@ -15,3 +15,4 @@ build/
 
 # Dependendo do seu editor, você pode querer adicionar arquivos específicos do seu editor, por exemplo, para o Visual Studio Code:
 .vscode/
+.vercel
