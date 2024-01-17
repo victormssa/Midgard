@@ -94,7 +94,7 @@ const authRoutes = async (fastify: FastifyInstance) => {
       }
 
       const token = fastify.jwt.sign({ id: userId });
-      reply.send({ token });
+      reply.send({ token, userId });
     } catch (error) {
       reply.status(500).send({ error: 'Internal Server Error' });
     }
